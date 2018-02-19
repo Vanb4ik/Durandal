@@ -1,0 +1,16 @@
+﻿
+section {
+	margin: 20px 20px;
+}
+
+.trashStyle {
+	color: coral;
+	margin: 5px 0;
+	transition: color 0.3s
+}
+
+.trashStyle:hover {
+	color: red;
+	transition: color 0.3s;
+}
+

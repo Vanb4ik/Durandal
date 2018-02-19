@@ -1,0 +1,8 @@
+# Dependency resource directories
+node_modules/
+.idea/
+
+# Dependency resource files
+package-lock.json
+.idea/workspace.xml
+
