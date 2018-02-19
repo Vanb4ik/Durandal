@@ -1,6 +1,13 @@
+# IDEA configs
+.idea/
+.vscode/
+.vs/
+*.csproj.user
+*.userprefs
+/logs/
+
 # Dependency resource directories
 node_modules/
-.idea/
 
 # Dependency resource files
 package-lock.json

@@ -32,6 +32,6 @@ define(['durandal/system', 'durandal/app', 'durandal/viewLocator', 'toastr'], (s
 
 		viewLocator.useConvention();
 
-		app.setRoot('viewmodels/shell');
+		app.setRoot("viewmodels/shell");
 	});
 });
