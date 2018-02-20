@@ -1,5 +1,7 @@
 import ko = require("knockout");
 import  jquery = require("jquery");
+import router = require("plugins/router");
+import Pagination = require("./pagination");
 
 interface previewsResponse {
 	data: IPreviewsData[],
@@ -16,26 +18,16 @@ interface IPreviewsData {
 	photo: string,
 }
 
-interface IUserFullData {
-	address: string,
-	birthday: string,
-	country: string,
-	email: string,
-	fullInfo: string,
-	fullName: string,
-	id: string,
-	photo: string,
-	profession: string,
-	shortInfo: string,
-}
 
 class ShellViewModel {
+	router = router;
 	previews: KnockoutObservableArray<IPreviewsData> = ko.observableArray([]);
 	currentPage: KnockoutObservable<number> = ko.observable(1);
 	totalPages: KnockoutObservable<number> = ko.observable(0);
 	selectedUser: KnockoutObservable<IUserFullData> = ko.observable(null);
 	countries: KnockoutObservableArray<string> = ko.observableArray([]);
 	pageNumbers: KnockoutObservableArray<number> = ko.observableArray([]);
+	// pagination =ko.observable( new Pagination(this.currentPage(), this.totalPages(), this.pageNumbers(), this.selectedUser())) ;
 
 	addNewUser = () => {
 		const newUser = {
@@ -77,6 +69,7 @@ class ShellViewModel {
 		const url = `/api/users/${userData.id}`;
 		jquery.getJSON(url).done((response: IUserFullData) => {
 			console.dir(response);
+			// console.dir(this.pagination().getSelectedUser());
 			this.selectedUser(response);
 		})
 	};
@@ -98,31 +91,10 @@ class ShellViewModel {
 		})
 	};
 
-	goToPage = (numberPage: number) => {
-		this.loadPreviews(numberPage)
-	};
-
-	goToPrevPage = () => {
-		if (this.currentPage() > 1) {
-			this.loadPreviews(this.currentPage() - 1)
-		}
-	};
-
-	goToNextPage = () => {
-		if (this.currentPage() < this.totalPages()) {
-			this.loadPreviews(this.currentPage() + 1)
-		}
-	};
-
-	getActivePageNumberFlag(pageNumber) {
-		return (pageNumber === this.currentPage())
-	}
-
 	mainScript = (context) => {
 		jquery( (f) => {
 				let element = f('#fixedTop');
-				console.dir(f(context).scrollTop());
-
+				// console.dir(f(context).scrollTop());
 			/*
 				const scrollHeight = 190;
 			if (f().scrollTop() < scrollHeight) {
@@ -165,22 +137,22 @@ class ShellViewModel {
 		}
 	};
 
-	loadCountries() {
+	loadCountries = () => {
 		const url = `/api/countries`;
 		jquery.getJSON(url).done((response: string[]) => {
 			this.countries(response);
 		})
-	}
+	};
 
-	getPageNumbers(totalelement: string | number) {
+	getPageNumbers = (totalelement: string | number) => {
 		const dataList = [];
 		for (let i = 0; i < Number(totalelement); i++) {
 			dataList.push(i + 1)
 		}
 		this.pageNumbers(dataList)
-	}
+	};
 
-	loadPreviews(pageNumber: number = 1) {
+	loadPreviews = (pageNumber: number = 1) => {
 		const url = `/api/users/${pageNumber}/10/preview`;
 		jquery.getJSON(url).done((response: previewsResponse) => {
 			this.previews(response.data);
@@ -191,16 +163,23 @@ class ShellViewModel {
 				this.getSelectedUser(response.data[0])
 			}
 		})
-	}
+	};
 
-	initialLoad() {
+	initialLoad = () => {
 		this.loadCountries();
 		this.loadPreviews(1);
-	}
+	};
 
-	constructor() {
+	initialRout = () => {
+		router.map([
+			{route:"", title:"Welcome", moduleId: 'viewmodels/pagination', nav: true }
+		]).buildNavigationModel();
+		router.activate()
+	};
+
+	activate = () => {
 		this.initialLoad();
-		// this.selectedUser.subscribe(newValue => console.dir(newValue))
+		this.initialRout();
 	}
 }
 

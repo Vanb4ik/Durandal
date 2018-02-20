@@ -1,0 +1,4 @@
+﻿interface KnockoutBindingHandlers
+{
+    slider: KnockoutBindingHandler;
+}

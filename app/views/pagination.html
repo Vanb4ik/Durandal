@@ -1,0 +1,28 @@
+<pagination params = "params:currentPage">
+  <div class="panel-footer">
+    <ul class="pagination">
+      <li data-bind="css: {disabled:currentPage() === 1}"><!--якщо перша сторінка то назад кнопка не активна-->
+        <a href="#"
+           data-bind="click: goToPrevPage">
+          <i class="glyphicon glyphicon-arrow-left"></i>
+        </a>
+      </li>
+      <!-- ko foreach: pageNumbers -->
+      <li data-bind="css: {active: $data === $parent.currentPage()}">
+        <a href="#"
+           data-bind="text: $data, click: $parent.goToPage">:-)
+        </a>
+      </li>
+      <!-- /ko -->
+      <li data-bind="css: {disabled:currentPage() === totalPages()}">
+        <!--якщо перша сторінка то назад кнопка не активна-->
+        <a href="#"
+           data-bind="click: goToNextPage">
+          <i class="glyphicon glyphicon-arrow-right"></i>
+        </a>
+        <h6 data-bind="text: thisPage"></h6>
+        <h6 data-bind="text: allPages"></h6>
+      </li>
+    </ul>
+  </div>
+</pagination>

@@ -1,14 +1,16 @@
-define(["require", "exports", "knockout", "jquery"], function (require, exports, ko, jquery) {
+define(["require", "exports", "knockout", "jquery", "plugins/router"], function (require, exports, ko, jquery, router) {
     "use strict";
     var ShellViewModel = (function () {
         function ShellViewModel() {
             var _this = this;
+            this.router = router;
             this.previews = ko.observableArray([]);
             this.currentPage = ko.observable(1);
             this.totalPages = ko.observable(0);
             this.selectedUser = ko.observable(null);
             this.countries = ko.observableArray([]);
             this.pageNumbers = ko.observableArray([]);
+            // pagination =ko.observable( new Pagination(this.currentPage(), this.totalPages(), this.pageNumbers(), this.selectedUser())) ;
             this.addNewUser = function () {
                 var newUser = {
                     address: "",
@@ -46,6 +48,7 @@ define(["require", "exports", "knockout", "jquery"], function (require, exports,
                 var url = "/api/users/" + userData.id;
                 jquery.getJSON(url).done(function (response) {
                     console.dir(response);
+                    // console.dir(this.pagination().getSelectedUser());
                     _this.selectedUser(response);
                 });
             };
@@ -64,23 +67,10 @@ define(["require", "exports", "knockout", "jquery"], function (require, exports,
                     _this.loadPreviews(1);
                 });
             };
-            this.goToPage = function (numberPage) {
-                _this.loadPreviews(numberPage);
-            };
-            this.goToPrevPage = function () {
-                if (_this.currentPage() > 1) {
-                    _this.loadPreviews(_this.currentPage() - 1);
-                }
-            };
-            this.goToNextPage = function () {
-                if (_this.currentPage() < _this.totalPages()) {
-                    _this.loadPreviews(_this.currentPage() + 1);
-                }
-            };
             this.mainScript = function (context) {
                 jquery(function (f) {
                     var element = f('#fixedTop');
-                    console.dir(f(context).scrollTop());
+                    // console.dir(f(context).scrollTop());
                     /*
                         const scrollHeight = 190;
                     if (f().scrollTop() < scrollHeight) {
@@ -121,44 +111,47 @@ define(["require", "exports", "knockout", "jquery"], function (require, exports,
                     _this.addNewUser();
                 }
             };
-            this.initialLoad();
-            // this.selectedUser.subscribe(newValue => console.dir(newValue))
-        }
-        ShellViewModel.prototype.getActivePageNumberFlag = function (pageNumber) {
-            return (pageNumber === this.currentPage());
-        };
-        ShellViewModel.prototype.loadCountries = function () {
-            var _this = this;
-            var url = "/api/countries";
-            jquery.getJSON(url).done(function (response) {
-                _this.countries(response);
-            });
-        };
-        ShellViewModel.prototype.getPageNumbers = function (totalelement) {
-            var dataList = [];
-            for (var i = 0; i < Number(totalelement); i++) {
-                dataList.push(i + 1);
-            }
-            this.pageNumbers(dataList);
-        };
-        ShellViewModel.prototype.loadPreviews = function (pageNumber) {
-            var _this = this;
-            if (pageNumber === void 0) { pageNumber = 1; }
-            var url = "/api/users/" + pageNumber + "/10/preview";
-            jquery.getJSON(url).done(function (response) {
-                _this.previews(response.data);
-                _this.currentPage(response.page);
-                _this.totalPages(response.totalPages);
-                _this.getPageNumbers(response.totalPages);
-                if (response.data.length > 0) {
-                    _this.getSelectedUser(response.data[0]);
+            this.loadCountries = function () {
+                var url = "/api/countries";
+                jquery.getJSON(url).done(function (response) {
+                    _this.countries(response);
+                });
+            };
+            this.getPageNumbers = function (totalelement) {
+                var dataList = [];
+                for (var i = 0; i < Number(totalelement); i++) {
+                    dataList.push(i + 1);
                 }
-            });
-        };
-        ShellViewModel.prototype.initialLoad = function () {
-            this.loadCountries();
-            this.loadPreviews(1);
-        };
+                _this.pageNumbers(dataList);
+            };
+            this.loadPreviews = function (pageNumber) {
+                if (pageNumber === void 0) { pageNumber = 1; }
+                var url = "/api/users/" + pageNumber + "/10/preview";
+                jquery.getJSON(url).done(function (response) {
+                    _this.previews(response.data);
+                    _this.currentPage(response.page);
+                    _this.totalPages(response.totalPages);
+                    _this.getPageNumbers(response.totalPages);
+                    if (response.data.length > 0) {
+                        _this.getSelectedUser(response.data[0]);
+                    }
+                });
+            };
+            this.initialLoad = function () {
+                _this.loadCountries();
+                _this.loadPreviews(1);
+            };
+            this.initialRout = function () {
+                router.map([
+                    { route: "", title: "Welcome", moduleId: 'viewmodels/pagination', nav: true }
+                ]).buildNavigationModel();
+                router.activate();
+            };
+            this.activate = function () {
+                _this.initialLoad();
+                _this.initialRout();
+            };
+        }
         return ShellViewModel;
     }());
     return ShellViewModel;
